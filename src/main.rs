@@ -99,17 +99,15 @@ fn main() -> io::Result<()> {
 
   let mut is_decripting = false;
   for filename in files {
-    let mut content = match read_file_content(&filename) {
-      Ok(v) => v,
-      Err(e) => return Err(e),
-    };
-
-    xor_file_content(&mut content, &password);
-
     if re.is_match(&filename) {
       is_decripting = true;
       fs::remove_file(&filename)?;
     } else {
+      let mut content = match read_file_content(&filename) {
+        Ok(v) => v,
+        Err(e) => return Err(e),
+      };
+      xor_file_content(&mut content, &password);
       write_xored_contend_to_files(&mut content, &filename)?;
     }
   }
