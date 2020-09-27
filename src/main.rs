@@ -58,7 +58,6 @@ fn xor_file_content(v: &mut Vec<u8>, password: &String) {
   let mut ipassword = 0;
   for i in 0..v.len() {
     let ascii_value = password.chars().nth(ipassword).unwrap() as u8;
-    print!("{} {} {}\n", v[i], ascii_value, v[i] ^ ascii_value);
     v[i] = v[i] ^ ascii_value;
     ipassword += 1;
     if ipassword == password.len() {
@@ -74,7 +73,7 @@ fn write_xored_contend_to_files(v: &mut Vec<u8>, filename: &String) -> io::Resul
 }
 
 fn report_error(error_message: &str) {
-  print!("Error: {}.", error_message);
+  print!("Error: {}.\n", error_message);
   process::exit(0);
 }
 
@@ -105,11 +104,9 @@ fn main() -> io::Result<()> {
 
     xor_file_content(&mut content, &password);
 
-    print!("{}\n", filename);
     let re = regex::Regex::new(r"files_are_encripted").unwrap();
     match re.find(&filename) {
       Some(_) => {
-          print!("okok1");
           is_decripting = true;
           fs::remove_file(&filename)?;
       },
